@@ -2,9 +2,9 @@ import mysql.connector
 
 def get_db_connection():
     return mysql.connector.connect(
-        host='db5017038622.hosting-data.io',  # Por ejemplo: db12345678.hosting-data.io
-        user='dbu2178344',  # Usuario configurado
-        password='Balma1989.@',  # Contraseña configurada
-        database='banco_app',  # Nombre de la base de datos
+        host='db5017039478.hosting-data.io',  # Nombre del host
+        user='dbu2198138',  # Usuario de la base de datos
+        password='Balma1989.@',  # Contraseña de la base de datos
+        database='dbs13717170',  # Nombre de la base de datos
         port=3306  # Puerto estándar de MySQL
     )
