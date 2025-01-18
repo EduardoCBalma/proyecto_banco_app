@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión Bancaria</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Gestión Bancaria</h1>
+
+        <!-- Botón para Listado de Clientes -->
+        <a href="{{ url_for('listar_clientes') }}" class="btn btn-success mb-4">Ver Listado de Clientes</a>
+
+        <!-- Mensajes Flash -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert alert-info">
+                    <ul>
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Formulario de Clientes -->
+        <h2>Ingresar Cliente</h2>
+        <form id="form-clientes" action="{{ url_for('ingresar_cliente') }}" method="POST" class="mb-4 needs-validation" novalidate>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" class="form-control" id="nombre" name="nombre" required>
+                    <div class="invalid-feedback">Por favor ingresa el nombre.</div>
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="edad">Edad:</label>
+                    <input type="number" class="form-control" id="edad" name="edad" required>
+                    <div class="invalid-feedback">Por favor ingresa la edad.</div>
+                </div>
+                <div class="form-group col-md-3">
+                    <label for="genero">Género:</label>
+                    <select class="form-control" id="genero" name="genero" required>
+                        <option value="">Selecciona...</option>
+                        <option value="M">Masculino</option>
+                        <option value="F">Femenino</option>
+                    </select>
+                    <div class="invalid-feedback">Por favor selecciona el género.</div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label for="ingreso_mensual">Ingreso Mensual:</label>
+                    <input type="number" step="0.01" class="form-control" id="ingreso_mensual" name="ingreso_mensual" required>
+                    <div class="invalid-feedback">Por favor ingresa el ingreso mensual.</div>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="saldo_cuenta">Saldo en Cuenta:</label>
+                    <input type="number" step="0.01" class="form-control" id="saldo_cuenta" name="saldo_cuenta" required>
+                    <div class="invalid-feedback">Por favor ingresa el saldo de la cuenta.</div>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="productos_contratados">Productos Contratados:</label>
+                    <input type="number" class="form-control" id="productos_contratados" name="productos_contratados" required>
+                    <div class="invalid-feedback">Por favor ingresa la cantidad de productos contratados.</div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Ingresar Cliente</button>
+        </form>
+
+        <!-- Formulario para Subir un Archivo CSV -->
+        <h2>Subir Archivo CSV</h2>
+        <form id="form-csv" action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data" class="mb-4 needs-validation" novalidate>
+            <div class="form-group">
+                <label for="file">Selecciona un archivo CSV:</label>
+                <input type="file" class="form-control" id="file" name="file" accept=".csv" required>
+                <div class="invalid-feedback">Por favor selecciona un archivo CSV.</div>
+            </div>
+            <button type="submit" class="btn btn-primary">Subir Archivo</button>
+        </form>
+    </div>
+
+    <!-- JavaScript para Validación de Formularios -->
+    <script>
+        // Validación Bootstrap
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                // Selecciona todos los formularios que requieren validación
+                var forms = document.getElementsByClassName('needs-validation');
+                Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
