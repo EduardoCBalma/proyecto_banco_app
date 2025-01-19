@@ -1,40 +1,68 @@
-/* Estilo General */
+/* Fijar la barra de navegación */
+.navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+/* Añadir margen superior para evitar que el contenido quede detrás de la navbar */
 body {
+  padding-top: 70px; /* Ajustar según la altura de la navbar */
   font-family: 'Arial', sans-serif;
   background-color: #f8f9fa;
   margin: 0;
   padding: 0;
 }
 
+/* Fijar el pie de página */
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #343a40;
+  color: white;
+  text-align: center;
+  padding: 10px 0;
+}
+
+/* Estilo General */
+body {
+  font-family: 'Helvetica Neue', sans-serif;
+  background-color: #f0f0f0;
+  margin: 0;
+  padding: 0;
+}
+
 /* Contenedor Principal */
 .container {
-  margin-top: 30px;
+  margin-top: 40px;
   background: #ffffff;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  padding: 25px;
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.15);
 }
 
 /* Títulos */
 h1, h2 {
   color: #343a40;
-  font-weight: bold;
-  margin-bottom: 20px;
+  font-weight: 700;
+  margin-bottom: 25px;
   text-align: center;
 }
 
 /* Formularios */
 form {
   margin-bottom: 30px;
-  padding: 15px;
+  padding: 20px;
   border: 1px solid #dee2e6;
   border-radius: 10px;
-  background-color: #ffffff;
+  background-color: #f8f9fa;
 }
 
 /* Etiquetas */
 label {
-  font-weight: bold;
+  font-weight: 600;
   color: #495057;
 }
 
@@ -43,11 +71,11 @@ button {
   background: #007bff;
   color: #ffffff;
   border: none;
-  padding: 10px 20px;
+  padding: 12px 24px;
   border-radius: 5px;
   font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease-in-out;
 }
 
 button:hover {
@@ -57,17 +85,18 @@ button:hover {
 /* Inputs y Selects */
 input[type="text"], input[type="number"], input[type="datetime-local"], select, input[type="file"] {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   margin: 10px 0;
   border: 1px solid #ced4da;
   border-radius: 5px;
   box-sizing: border-box;
+  font-size: 14px;
 }
 
-input[type="text"]:focus, input[type="number"]:focus, input[type="datetime-local"]:focus, select:focus, input[type="file"]:focus {
+input[type="text"]:focus, input[type="number"]:focus, select:focus {
   border-color: #007bff;
   outline: none;
-  box-shadow: 0px 0px 4px rgba(0, 123, 255, 0.5);
+  box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.6);
 }
 
 /* Mensajes Flash */
@@ -75,7 +104,7 @@ input[type="text"]:focus, input[type="number"]:focus, input[type="datetime-local
   border-radius: 5px;
   margin: 20px 0;
   padding: 15px;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .alert-info {
@@ -86,12 +115,12 @@ input[type="text"]:focus, input[type="number"]:focus, input[type="datetime-local
 
 /* Resumen de Datos */
 .summary-container {
-  padding: 15px;
+  padding: 20px;
   margin-top: 20px;
   background-color: #f8f9fa;
   border: 1px solid #dee2e6;
   border-radius: 5px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
 }
 
 .summary-container h3 {
