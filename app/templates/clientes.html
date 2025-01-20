@@ -45,7 +45,82 @@
         </div>
     </nav>
 
-        <!-- Mensajes Flash -->
+    <h1 class="text-center mb-4">Gestión de Clientes</h1>
+
+    <div class="container mt-4">
+        <h2 class="text-center">Filtrar Clientes</h2>
+        <form action="{{ url_for('listar_clientes') }}" method="GET" class="mb-4">
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <input type="text" class="form-control" name="nombre" placeholder="Buscar por nombre" value="{{ request.args.get('nombre', '') }}">
+                </div>
+                <div class="form-group col-md-3">
+                    <input type="number" class="form-control" name="edad" placeholder="Buscar por edad" value="{{ request.args.get('edad', '') }}">
+                </div>
+                <div class="form-group col-md-3">
+                    <select class="form-control" name="genero">
+                        <option value="">Filtrar por género</option>
+                        <option value="M" {% if request.args.get('genero') == 'M' %}selected{% endif %}>Masculino</option>
+                        <option value="F" {% if request.args.get('genero') == 'F' %}selected{% endif %}>Femenino</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="ingreso_min">Ingreso Mensual:</label>
+                    <input type="number" class="form-control" name="ingreso_min" placeholder="Mínimo" value="{{ request.args.get('ingreso_min', '') }}">
+                    <input type="number" class="form-control mt-2" name="ingreso_max" placeholder="Máximo" value="{{ request.args.get('ingreso_max', '') }}">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="saldo_min">Saldo en Cuenta:</label>
+                    <input type="number" class="form-control" name="saldo_min" placeholder="Mínimo" value="{{ request.args.get('saldo_min', '') }}">
+                    <input type="number" class="form-control mt-2" name="saldo_max" placeholder="Máximo" value="{{ request.args.get('saldo_max', '') }}">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="historial_credito">Historial de Crédito:</label>
+                    <select class="form-control" name="historial_credito">
+                        <option value="">Seleccionar...</option>
+                        <option value="1" {% if request.args.get('historial_credito') == '1' %}selected{% endif %}>1 (Muy Bajo)</option>
+                        <option value="10" {% if request.args.get('historial_credito') == '10' %}selected{% endif %}>10 (Excelente)</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="estado_civil">Estado Civil:</label>
+                    <select class="form-control" name="estado_civil">
+                        <option value="">Seleccionar...</option>
+                        <option value="Soltero" {% if request.args.get('estado_civil') == 'Soltero' %}selected{% endif %}>Soltero</option>
+                        <option value="Casado" {% if request.args.get('estado_civil') == 'Casado' %}selected{% endif %}>Casado</option>
+                        <option value="Divorciado" {% if request.args.get('estado_civil') == 'Divorciado' %}selected{% endif %}>Divorciado</option>
+                        <option value="Viudo" {% if request.args.get('estado_civil') == 'Viudo' %}selected{% endif %}>Viudo</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="cantidad_prestamos">Cantidad de Préstamos:</label>
+                    <input type="number" class="form-control" name="cantidad_prestamos" placeholder="Ej. 2" value="{{ request.args.get('cantidad_prestamos', '') }}">
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="fecha_registro">Fecha de Registro:</label>
+                    <input type="date" class="form-control" name="fecha_registro" value="{{ request.args.get('fecha_registro', '') }}">
+                </div>
+                <div class="form-group col-md-2">
+                    <button type="submit" class="btn btn-primary btn-block">Filtrar</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Mostrar el total de clientes encontrados después de aplicar filtros -->
+            {% if total_filtrados is defined %}
+            <div class="alert alert-info text-center mt-3">
+                <strong>Total de clientes encontrados: {{ total_filtrados }}</strong>
+            </div>
+        {% endif %}
+
+            <!-- Botón para restablecer los filtros -->
+        <div class="text-center">
+            <a href="{{ url_for('listar_clientes') }}" class="btn btn-secondary">Restablecer</a>
+        </div>
+    </div>
+    
+    <!-- Mensajes Flash -->
+    <div class="container mt-5">
         {% with messages = get_flashed_messages() %}
         {% if messages %}
             <div class="alert alert-info">
@@ -58,46 +133,48 @@
         {% endif %}
         {% endwith %}
 
-    <div class="container mt-5">
-        <h1 class="text-center mb-4">Gestión de Clientes</h1>
+        <!-- Sección de eliminación con pestañas -->
+        <div class="card mb-4 shadow-sm mt-4">
+            <div class="card-header bg-secondary text-white">
+                <h4 class="mb-0">Administrar Clientes</h4>
+            </div>
+            <div class="card-body">
+                <ul class="nav nav-tabs" id="clienteTabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="eliminar-id-tab" data-toggle="tab" href="#eliminar-id" role="tab">Eliminar por ID</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="eliminar-todos-tab" data-toggle="tab" href="#eliminar-todos" role="tab">Eliminar Todos</a>
+                    </li>
+                </ul>
+                <div class="tab-content mt-3">
+                    <div class="tab-pane fade show active" id="eliminar-id" role="tabpanel">
+                        <form action="{{ url_for('eliminar_cliente') }}" method="POST" class="needs-validation" novalidate>
+                            <div class="form-group">
+                                <label for="cliente_id">ID del Cliente a Eliminar:</label>
+                                <input type="number" class="form-control" id="cliente_id" name="cliente_id" required>
+                                <div class="invalid-feedback">Por favor ingresa un ID de cliente válido.</div>
+                            </div>
+                            <button type="submit" class="btn btn-danger btn-block">Eliminar por ID</button>
+                        </form>
+                    </div>
+                    <div class="tab-pane fade" id="eliminar-todos" role="tabpanel">
+                        <p class="text-center">Esta acción eliminará todos los registros de clientes.</p>
+                        <form action="{{ url_for('eliminar_todos_clientes') }}" method="POST">
+                            <button type="submit" class="btn btn-warning btn-block" onclick="return confirm('¿Estás seguro de eliminar todos los clientes?');">Eliminar Todos</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                <!-- Botón para limpiar datos -->
+        <!-- Botón para limpiar datos -->
         <div class="text-center mt-4">
             <form action="{{ url_for('limpiar_datos') }}" method="POST">
                 <button type="submit" class="btn btn-warning" onclick="return confirm('¿Estás seguro de que deseas limpiar los datos?');">
                     Limpiar Datos
                 </button>
             </form>
-        </div>
-
-        <!-- Formulario para eliminar cliente por ID -->
-        <div class="card mb-4 shadow-sm">
-            <div class="card-header bg-danger text-white">
-                <h4 class="mb-0">Eliminar Cliente</h4>
-            </div>
-            <div class="card-body">
-                <form action="{{ url_for('eliminar_cliente') }}" method="POST" class="needs-validation" novalidate>
-                    <div class="form-group">
-                        <label for="cliente_id">ID del Cliente a Eliminar:</label>
-                        <input type="number" class="form-control" id="cliente_id" name="cliente_id" required>
-                        <div class="invalid-feedback">Por favor ingresa un ID de cliente válido.</div>
-                    </div>
-                    <button type="submit" class="btn btn-danger btn-block">Eliminar por ID</button>
-                </form>
-            </div>
-        </div>
-
-        <!-- Formulario para eliminar todos los clientes -->
-        <div class="card mb-4 shadow-sm">
-            <div class="card-header bg-warning text-dark">
-                <h4 class="mb-0">Eliminar Todos los Clientes</h4>
-            </div>
-            <div class="card-body text-center">
-                <p>Esta acción eliminará todos los registros de clientes.</p>
-                <form action="{{ url_for('eliminar_todos_clientes') }}" method="POST">
-                    <button type="submit" class="btn btn-warning btn-block" onclick="return confirm('¿Estás seguro de eliminar todos los clientes?');">Eliminar Todos</button>
-                </form>
-            </div>
         </div>
 
         <!-- Tabla de Resultados Finales -->

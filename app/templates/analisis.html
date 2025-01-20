@@ -50,42 +50,86 @@
         <h1 class="text-center mb-4">Análisis Financiero</h1>
 
         <!-- Resumen de Datos -->
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-primary text-white">
-                        <h4>Resumen de Clientes</h4>
-                    </div>
-                    <div class="card-body">
-                        <p><strong>Total de Clientes:</strong> {{ resumen.total_clientes }}</p>
-                        <p><strong>Saldo Total:</strong> ${{ resumen.saldo_total }}</p>
-                        <p><strong>Promedio de Edad:</strong> {{ resumen.promedio_edad }}</p>
-                        <p><strong>Promedio de Ingreso Mensual:</strong> ${{ resumen.promedio_ingreso }}</p>
-                    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4>Resumen de Clientes</h4>
                 </div>
-            </div>
-
-            <div class="col-md-6">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-info text-white">
-                        <h4>Resumen de Préstamos</h4>
-                    </div>
-                    <div class="card-body">
-                        <p><strong>Total de Préstamos:</strong> {{ resumen.total_prestamos }}</p>
-                        <p><strong>Monto Total Prestado:</strong> ${{ resumen.monto_total_prestamos }}</p>
-                        <p><strong>Tasa de Interés Promedio:</strong> {{ resumen.promedio_tasa_interes }}%</p>
-                    </div>
+                <div class="card-body">
+                    <p><strong>Total de Clientes:</strong> {{ resumen.total_clientes if resumen is defined else 0 }}</p>
+                    <p><strong>Saldo Total:</strong> ${{ resumen.saldo_total if resumen is defined else 0 }}</p>
+                    <p><strong>Promedio de Edad:</strong> {{ resumen.promedio_edad if resumen is defined else 0 }}</p>
+                    <p><strong>Promedio de Ingreso Mensual:</strong> ${{ resumen.promedio_ingreso if resumen is defined else 0 }}</p>
                 </div>
             </div>
         </div>
 
-        <!-- Gráficos -->
-        <div class="mt-5">
-            <h3 class="text-center mb-4">Visualizaciones de Datos</h3>
-            <img src="{{ url_for('static', filename='images/grafico_edad_ingreso.png') }}" class="img-fluid" alt="Gráfico de edad vs ingreso">
-            <img src="{{ url_for('static', filename='images/grafico_saldo_clientes.png') }}" class="img-fluid mt-4" alt="Gráfico de saldo por cliente">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h4>Resumen de Préstamos</h4>
+                </div>
+                <div class="card-body">
+                    <p><strong>Total de Préstamos:</strong> {{ resumen.total_prestamos if resumen is defined else 0 }}</p>
+                    <p><strong>Monto Total Prestado:</strong> ${{ resumen.monto_total_prestamos if resumen is defined else 0 }}</p>
+                    <p><strong>Tasa de Interés Promedio:</strong> {{ resumen.promedio_tasa_interes if resumen is defined else 0 }}</p>
+                </div>
+            </div>
         </div>
     </div>
+
+    <!-- Predecir Riesgo de Cliente -->
+    <div class="mt-5">
+        <h3 class="text-center mb-4">Predecir Riesgo de Cliente</h3>
+        <div class="card shadow-sm">
+            <div class="card-header bg-warning text-white">
+                <h4>Buscar Cliente</h4>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('predecir_cliente_view') }}" method="POST" class="needs-validation" novalidate>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="cliente_id">ID del Cliente:</label>
+                            <input type="number" class="form-control" id="cliente_id" name="cliente_id">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="nombre">Nombre del Cliente:</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-warning btn-block">Buscar y Predecir</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {% if cliente %}
+    <!-- Mostrar detalles del cliente -->
+    <div class="mt-5">
+        <h4 class="text-center">Detalles del Cliente</h4>
+        <table class="table table-bordered">
+            <tr><th>Nombre</th><td>{{ cliente.nombre }}</td></tr>
+            <tr><th>Edad</th><td>{{ cliente.edad }}</td></tr>
+            <tr><th>Ingreso Mensual</th><td>{{ cliente.ingreso_mensual }}</td></tr>
+            <tr><th>Saldo en Cuenta</th><td>{{ cliente.saldo_cuenta }}</td></tr>
+            <tr><th>Productos Contratados</th><td>{{ cliente.productos_contratados }}</td></tr>
+            <tr><th>Historial de Crédito</th><td>{{ cliente.historial_credito }}</td></tr>
+            <tr><th>Cantidad de Préstamos</th><td>{{ cliente.cantidad_prestamos }}</td></tr>
+            <tr><th>Monto Total de Préstamos</th><td>{{ cliente.monto_total_prestamos }}</td></tr>
+        </table>
+    </div>
+    {% endif %}
+
+    {% if prediccion is not none %}
+    <!-- Mostrar Predicción -->
+    <div class="mt-4 alert alert-info text-center">
+        <h5>Predicción de Riesgo de Crédito:</h5>
+        <p class="font-weight-bold">{{ prediccion }}</p>
+    </div>
+    {% endif %}
+
+
 
     <!-- Pie de página fijo -->
     <footer class="footer">
