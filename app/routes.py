@@ -4,9 +4,30 @@ import pandas as pd
 from app.models import get_db_connection
 from app.data_cleaning import limpiar_datos as limpiar_datos_script
 from app.model_predict import predecir_cliente
+from app.models import Clientes
+from flask import render_template
+from app.models import obtener_clientes, obtener_prestamos, obtener_transacciones, obtener_fraudes, obtener_pagos
 
-@app.route('/upload_prestamos', methods=['POST'])
-def upload_prestamos():
+def process_csv_file(file):
+    df = pd.read_csv(file)
+    df.fillna({
+        'nombre': 'Desconocido',
+        'edad': 0,
+        'genero': 'No especificado',
+        'ingreso_mensual': 0.00,
+        'saldo_cuenta': 0.00,
+        'productos_contratados': 0,
+        'historial_credito': 1,
+        'cantidad_prestamos': 0,
+        'monto_total_prestamos': 0.00,
+        'estado_civil': 'No especificado',
+        'ocupacion': 'No especificado'
+    }, inplace=True)
+    df.replace({pd.NA: None, 'nan': None, 'NaN': None, '': None}, inplace=True)
+    return df
+
+@app.route('/upload_clientes', methods=['POST'])
+def upload_clientes():
     if 'file' not in request.files:
         flash("No se subió ningún archivo", "error")
         return redirect(url_for('home'))
@@ -15,6 +36,46 @@ def upload_prestamos():
     if file.filename == '':
         flash("El archivo no tiene nombre", "error")
         return redirect(url_for('home'))
+
+    try:
+        df = process_csv_file(file)
+
+        connection = get_db_connection()
+        cursor = connection.cursor()
+
+        for index, row in df.iterrows():
+            cursor.execute("""
+                INSERT INTO clientes (cliente_id, nombre, edad, genero, ingreso_mensual, saldo_cuenta, productos_contratados, historial_credito, 
+                cantidad_prestamos, monto_total_prestamos, estado_civil, ocupacion)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, (
+                row['cliente_id'], row['nombre'], row['edad'], row['genero'], row['ingreso_mensual'],
+                row['saldo_cuenta'], row['productos_contratados'], row['historial_credito'],
+                row['cantidad_prestamos'], row['monto_total_prestamos'], row['estado_civil'], row['ocupacion']
+            ))
+
+        connection.commit()
+        connection.close()
+        flash("Archivo CSV de clientes procesado correctamente", "success")
+    except Exception as e:
+        flash(f"Error al procesar el archivo CSV: {e}", "error")
+
+    return redirect(url_for('home'))
+
+@app.route('/prestamo')
+def prestamo_home():
+    return render_template('upload.html')
+
+@app.route('/upload_prestamos', methods=['POST'])
+def upload_prestamos():
+    if 'file' not in request.files:
+        flash("No se subió ningún archivo", "error")
+        return redirect(url_for('prestamo_home'))
+    
+    file = request.files['file']
+    if file.filename == '':
+        flash("El archivo no tiene nombre", "error")
+        return redirect(url_for('prestamo_home'))
 
     try:
         df = pd.read_csv(file)
@@ -35,7 +96,7 @@ def upload_prestamos():
     except Exception as e:
         flash(f"Error al procesar el archivo: {e}", "error")
 
-    return redirect(url_for('home'))
+    return redirect(url_for('prestamo_home'))
 
 @app.route('/upload_fraudes', methods=['POST'])
 def upload_fraudes():
@@ -131,7 +192,6 @@ def upload_pagos():
         flash(f"Error al procesar el archivo: {e}", "error")
 
     return redirect(url_for('home'))
-
 
 @app.route('/')
 def home():
@@ -324,36 +384,48 @@ def upload_file():
 
     return redirect(url_for('home'))
 
+@app.route('/datos')
+def datos():
+    clientes = obtener_clientes()
+    prestamos = obtener_prestamos()
+    transacciones = obtener_transacciones()
+    fraudes = obtener_fraudes()
+    pagos = obtener_pagos()
+
+    return render_template(
+        'datos.html', 
+        clientes=clientes, 
+        prestamos=prestamos, 
+        transacciones=transacciones, 
+        fraudes=fraudes, 
+        pagos=pagos
+    )
+
 @app.route('/analisis')
 def analisis():
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
 
-    cursor.execute("""
-        SELECT 
-            COUNT(*) AS total_clientes,
-            COALESCE(SUM(saldo_cuenta), 0) AS saldo_total,
-            COALESCE(AVG(edad), 0) AS promedio_edad,
-            COALESCE(AVG(ingreso_mensual), 0) AS promedio_ingreso,
-            COUNT(*) AS total_prestamos,
-            COALESCE(SUM(monto_total_prestamos), 0) AS monto_total_prestamos,
-            COALESCE(AVG(historial_credito), 0) AS promedio_historial_credito
-        FROM clientes
-    """)
+    # Obtener datos de clientes
+    cursor.execute("SELECT COUNT(*) AS total_clientes FROM clientes")
+    total_clientes = cursor.fetchone()['total_clientes']
 
-    resumen = cursor.fetchone()
+    # Obtener la distribución de préstamos
+    cursor.execute("SELECT estado_prestamo, COUNT(*) AS cantidad FROM prestamos GROUP BY estado_prestamo")
+    prestamos_estado = cursor.fetchall()
+
+    # Obtener la distribución de fraudes
+    cursor.execute("SELECT estado, COUNT(*) AS cantidad FROM fraudes GROUP BY estado")
+    fraudes_estado = cursor.fetchall()
+
+    # Obtener el flujo de transacciones
+    cursor.execute("SELECT tipo_transaccion, SUM(monto) AS total FROM transacciones GROUP BY tipo_transaccion")
+    transacciones_tipo = cursor.fetchall()
+
     connection.close()
 
-    # Si no hay datos en la base, proporcionar valores por defecto
-    if resumen is None:
-        resumen = {
-            'total_clientes': 0,
-            'saldo_total': 0.0,
-            'promedio_edad': 0,
-            'promedio_ingreso': 0.0,
-            'total_prestamos': 0,
-            'monto_total_prestamos': 0.0,
-            'promedio_historial_credito': 0.0
-        }
-
-    return render_template('analisis.html', resumen=resumen)
+    return render_template('analisis.html',
+                           total_clientes=total_clientes,
+                           prestamos_estado=prestamos_estado,
+                           fraudes_estado=fraudes_estado,
+                           transacciones_tipo=transacciones_tipo)

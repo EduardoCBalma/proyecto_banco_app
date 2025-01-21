@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión Bancaria</title>
+    <title>BancoApp</title>
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -40,6 +40,9 @@
                     <a class="nav-link" href="{{ url_for('listar_clientes') }}">Clientes</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('datos') }}">Datos</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('analisis') }}">Análisis</a>
                 </li>
             </ul>
@@ -66,9 +69,13 @@
         {% endwith %}
 
         <!-- Formulario de Clientes -->
-        <h2 class="text-center">Ingresar Cliente</h2>
         <form id="form-clientes" action="{{ url_for('ingresar_cliente') }}" method="POST" class="mb-4 needs-validation" novalidate>
             <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label for="cliente_id">ID Cliente:</label>
+                    <input type="number" class="form-control" id="cliente_id" name="cliente_id" placeholder="Ej. 1001" required>
+                    <div class="invalid-feedback">Por favor ingresa el ID del cliente.</div>
+                </div>
                 <div class="form-group col-md-4">
                     <label for="nombre">Nombre:</label>
                     <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ej. Juan Pérez" required>
@@ -100,7 +107,7 @@
                     <div class="invalid-feedback">Por favor selecciona el estado civil.</div>
                 </div>
             </div>
-
+        
             <div class="form-row">
                 <div class="form-group col-md-4">
                     <label for="ingreso_mensual">Ingreso Mensual:</label>
@@ -136,53 +143,103 @@
                     <input type="text" class="form-control" id="ocupacion" name="ocupacion" required>
                 </div>                             
             </div>
-
+        
             <button type="submit" class="btn btn-primary btn-block">Ingresar Cliente</button>
-        </form>
+        </form>        
 
-        <!-- Formulario para Subir un Archivo CSV - Préstamos -->
-        <h2 class="text-center">Subir Préstamos</h2>
-        <form id="form-prestamos" action="{{ url_for('upload_prestamos') }}" method="POST" enctype="multipart/form-data" class="mb-4 needs-validation" novalidate>
-            <div class="form-group">
-                <label for="file_prestamos">Selecciona un archivo CSV:</label>
-                <input type="file" class="form-control" id="file_prestamos" name="file" accept=".csv" required>
-                <div class="invalid-feedback">Por favor selecciona un archivo CSV.</div>
-            </div>
-            <button type="submit" class="btn btn-primary btn-block">Subir Archivo de Préstamos</button>
-        </form>
+        <h2 class="text-center">Gestión de Archivos CSV</h2>
+<div class="card mb-4 shadow-sm">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0 text-center">Cargar Archivos CSV</h4>
+    </div>
+    <div class="card-body">
+        <ul class="nav nav-tabs" id="uploadTabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="clientes-tab" data-toggle="tab" href="#clientes" role="tab">Clientes</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="prestamos-tab" data-toggle="tab" href="#prestamos" role="tab">Préstamos</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="transacciones-tab" data-toggle="tab" href="#transacciones" role="tab">Transacciones</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="pagos-tab" data-toggle="tab" href="#pagos" role="tab">Pagos</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="fraudes-tab" data-toggle="tab" href="#fraudes" role="tab">Fraudes</a>
+            </li>
+        </ul>
 
-        <!-- Formulario para Subir un Archivo CSV - Transacciones -->
-        <h2 class="text-center">Subir Transacciones</h2>
-        <form id="form-transacciones" action="{{ url_for('upload_transacciones') }}" method="POST" enctype="multipart/form-data" class="mb-4 needs-validation" novalidate>
-            <div class="form-group">
-                <label for="file_transacciones">Selecciona un archivo CSV:</label>
-                <input type="file" class="form-control" id="file_transacciones" name="file" accept=".csv" required>
-                <div class="invalid-feedback">Por favor selecciona un archivo CSV.</div>
-            </div>
-            <button type="submit" class="btn btn-primary btn-block">Subir Archivo de Transacciones</button>
-        </form>
+            <div class="tab-content mt-3">
+                <!-- Subida de Clientes -->
+                <div class="tab-pane fade show active" id="clientes" role="tabpanel">
+                    <h5>Subir Clientes</h5>
+                    <form id="form-clientes-csv" action="{{ url_for('upload_clientes') }}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        <div class="form-group">
+                            <label for="file">Selecciona un archivo CSV de clientes:</label>
+                            <input type="file" class="form-control" id="file" name="file" accept=".csv" required>
+                            <div class="invalid-feedback">Por favor selecciona un archivo CSV válido.</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Subir Clientes</button>
+                    </form>
+                </div>
 
-        <!-- Formulario para Subir un Archivo CSV - Pagos -->
-        <h2 class="text-center">Subir Pagos</h2>
-        <form id="form-pagos" action="{{ url_for('upload_pagos') }}" method="POST" enctype="multipart/form-data" class="mb-4 needs-validation" novalidate>
-            <div class="form-group">
-                <label for="file_pagos">Selecciona un archivo CSV:</label>
-                <input type="file" class="form-control" id="file_pagos" name="file" accept=".csv" required>
-                <div class="invalid-feedback">Por favor selecciona un archivo CSV.</div>
-            </div>
-            <button type="submit" class="btn btn-primary btn-block">Subir Archivo de Pagos</button>
-        </form>
+                <!-- Subida de Préstamos -->
+                <div class="tab-pane fade" id="prestamos" role="tabpanel">
+                    <h5>Subir Préstamos</h5>
+                    <form id="form-prestamos-csv" action="{{ url_for('upload_prestamos') }}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        <div class="form-group">
+                            <label for="file">Selecciona un archivo CSV de préstamos:</label>
+                            <input type="file" class="form-control" id="file" name="file" accept=".csv" required>
+                            <div class="invalid-feedback">Por favor selecciona un archivo CSV válido.</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Subir Préstamos</button>
+                    </form>
+                </div>
 
-        <!-- Formulario para Subir un Archivo CSV - Fraudes -->
-        <h2 class="text-center">Subir Fraudes</h2>
-        <form id="form-fraudes" action="{{ url_for('upload_fraudes') }}" method="POST" enctype="multipart/form-data" class="mb-4 needs-validation" novalidate>
-            <div class="form-group">
-                <label for="file_fraudes">Selecciona un archivo CSV:</label>
-                <input type="file" class="form-control" id="file_fraudes" name="file" accept=".csv" required>
-                <div class="invalid-feedback">Por favor selecciona un archivo CSV.</div>
+                <!-- Subida de Transacciones -->
+                <div class="tab-pane fade" id="transacciones" role="tabpanel">
+                    <h5>Subir Transacciones</h5>
+                    <form id="form-transacciones-csv" action="{{ url_for('upload_transacciones') }}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        <div class="form-group">
+                            <label for="file">Selecciona un archivo CSV de transacciones:</label>
+                            <input type="file" class="form-control" id="file" name="file" accept=".csv" required>
+                            <div class="invalid-feedback">Por favor selecciona un archivo CSV válido.</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Subir Transacciones</button>
+                    </form>
+                </div>
+
+                <!-- Subida de Pagos -->
+                <div class="tab-pane fade" id="pagos" role="tabpanel">
+                    <h5>Subir Pagos</h5>
+                    <form id="form-pagos-csv" action="{{ url_for('upload_pagos') }}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        <div class="form-group">
+                            <label for="file">Selecciona un archivo CSV de pagos:</label>
+                            <input type="file" class="form-control" id="file" name="file" accept=".csv" required>
+                            <div class="invalid-feedback">Por favor selecciona un archivo CSV válido.</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Subir Pagos</button>
+                    </form>
+                </div>
+
+                <!-- Subida de Fraudes -->
+                <div class="tab-pane fade" id="fraudes" role="tabpanel">
+                    <h5>Subir Fraudes</h5>
+                    <form id="form-fraudes-csv" action="{{ url_for('upload_fraudes') }}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        <div class="form-group">
+                            <label for="file">Selecciona un archivo CSV de fraudes:</label>
+                            <input type="file" class="form-control" id="file" name="file" accept=".csv" required>
+                            <div class="invalid-feedback">Por favor selecciona un archivo CSV válido.</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Subir Fraudes</button>
+                    </form>
+                </div>
             </div>
-            <button type="submit" class="btn btn-primary btn-block">Subir Archivo de Fraudes</button>
-        </form>
+        </div>
+    </div>
+
 
 
     <!-- Pie de página fijo -->

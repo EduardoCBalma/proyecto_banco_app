@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center">Gestión de Datos</h2>
+
+    <!-- Navegación por pestañas -->
+    <ul class="nav nav-tabs" id="dataTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="clientes-tab" data-toggle="tab" href="#clientes" role="tab">Clientes</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="prestamos-tab" data-toggle="tab" href="#prestamos" role="tab">Préstamos</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="transacciones-tab" data-toggle="tab" href="#transacciones" role="tab">Transacciones</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="pagos-tab" data-toggle="tab" href="#pagos" role="tab">Pagos</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="fraudes-tab" data-toggle="tab" href="#fraudes" role="tab">Fraudes</a>
+        </li>
+    </ul>
+
+    <div class="tab-content mt-3">
+        <!-- Clientes -->
+        <div class="tab-pane fade show active" id="clientes" role="tabpanel">
+            <h4>Clientes</h4>
+            <table class="table table-bordered table-striped datatable">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>ID Cliente</th>
+                        <th>Nombre</th>
+                        <th>Edad</th>
+                        <th>Género</th>
+                        <th>Ingreso Mensual</th>
+                        <th>Saldo Cuenta</th>
+                        <th>Productos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cliente in clientes %}
+                    <tr>
+                        <td>{{ cliente.cliente_id }}</td>
+                        <td>{{ cliente.nombre }}</td>
+                        <td>{{ cliente.edad }}</td>
+                        <td>{{ cliente.genero }}</td>
+                        <td>{{ cliente.ingreso_mensual }}</td>
+                        <td>{{ cliente.saldo_cuenta }}</td>
+                        <td>{{ cliente.productos_contratados }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Préstamos -->
+        <div class="tab-pane fade" id="prestamos" role="tabpanel">
+            <h4>Préstamos</h4>
+            <table class="table table-bordered table-striped datatable">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>ID Préstamo</th>
+                        <th>ID Cliente</th>
+                        <th>Monto</th>
+                        <th>Tasa de Interés</th>
+                        <th>Plazo</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for prestamo in prestamos %}
+                    <tr>
+                        <td>{{ prestamo.prestamo_id }}</td>
+                        <td>{{ prestamo.cliente_id }}</td>
+                        <td>{{ prestamo.monto_prestamo }}</td>
+                        <td>{{ prestamo.tasa_interes }}</td>
+                        <td>{{ prestamo.plazo_meses }}</td>
+                        <td>{{ prestamo.estado_prestamo }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Transacciones -->
+        <div class="tab-pane fade" id="transacciones" role="tabpanel">
+            <h4>Transacciones</h4>
+            <table class="table table-bordered table-striped datatable">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>ID Transacción</th>
+                        <th>ID Cliente</th>
+                        <th>Tipo</th>
+                        <th>Monto</th>
+                        <th>Fecha</th>
+                        <th>Categoría</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaccion in transacciones %}
+                    <tr>
+                        <td>{{ transaccion.transaccion_id }}</td>
+                        <td>{{ transaccion.cliente_id }}</td>
+                        <td>{{ transaccion.tipo_transaccion }}</td>
+                        <td>{{ transaccion.monto }}</td>
+                        <td>{{ transaccion.fecha_transaccion }}</td>
+                        <td>{{ transaccion.categoria_transaccion }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagos -->
+        <div class="tab-pane fade" id="pagos" role="tabpanel">
+            <h4>Pagos</h4>
+            <table class="table table-bordered table-striped datatable">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>ID Pago</th>
+                        <th>ID Préstamo</th>
+                        <th>Monto Pagado</th>
+                        <th>Fecha</th>
+                        <th>Método</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pago in pagos %}
+                    <tr>
+                        <td>{{ pago.pago_id }}</td>
+                        <td>{{ pago.prestamo_id }}</td>
+                        <td>{{ pago.monto_pagado }}</td>
+                        <td>{{ pago.fecha_pago }}</td>
+                        <td>{{ pago.metodo_pago }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Fraudes -->
+        <div class="tab-pane fade" id="fraudes" role="tabpanel">
+            <h4>Fraudes</h4>
+            <table class="table table-bordered table-striped datatable">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>ID Fraude</th>
+                        <th>ID Cliente</th>
+                        <th>Descripción</th>
+                        <th>Monto Implicado</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fraude in fraudes %}
+                    <tr>
+                        <td>{{ fraude.fraude_id }}</td>
+                        <td>{{ fraude.cliente_id }}</td>
+                        <td>{{ fraude.descripcion }}</td>
+                        <td>{{ fraude.monto_implicado }}</td>
+                        <td>{{ fraude.fecha_fraude }}</td>
+                        <td>{{ fraude.estado }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
