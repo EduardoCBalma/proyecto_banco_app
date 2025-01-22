@@ -7,6 +7,7 @@ from app.model_predict import predecir_cliente
 from app.models import Clientes
 from flask import render_template
 from app.models import obtener_clientes, obtener_prestamos, obtener_transacciones, obtener_fraudes, obtener_pagos
+from datetime import datetime
 
 def process_csv_file(file):
     df = pd.read_csv(file)
@@ -161,7 +162,6 @@ def upload_transacciones():
 
     return redirect(url_for('home'))
 
-
 @app.route('/upload_pagos', methods=['POST'])
 def upload_pagos():
     if 'file' not in request.files:
@@ -175,23 +175,53 @@ def upload_pagos():
 
     try:
         df = pd.read_csv(file)
+
+        # Verificación de valores nulos
+        if df.isnull().values.any():
+            flash("El archivo contiene valores nulos", "error")
+            return redirect(url_for('home'))
+
+        # Convertir fechas al formato correcto para MySQL (yyyy-mm-dd)
+        df['fecha_pago'] = pd.to_datetime(df['fecha_pago'], format='%d/%m/%Y', errors='coerce').dt.strftime('%Y-%m-%d')
+
+        # Verificar si hay errores en la conversión de fecha
+        if df['fecha_pago'].isnull().any():
+            flash("Error en el formato de fecha, debe ser dd/mm/yyyy", "error")
+            return redirect(url_for('home'))
+
         connection = get_db_connection()
         cursor = connection.cursor()
 
         for index, row in df.iterrows():
+            cursor.execute("SELECT prestamo_id FROM prestamos WHERE prestamo_id = %s", (row['prestamo_id'],))
+            resultado = cursor.fetchone()
+
+            if not resultado:
+                print(f"Error: préstamo ID {row['prestamo_id']} no existe en la base de datos.")
+                continue  # Saltar esta fila
+
+            # Inserción si el ID existe
             cursor.execute("""
-                INSERT INTO pagos (prestamo_id, monto_pagado, fecha_pago, metodo_pago)
+                INSERT INTO pagos (prestamo_id, monto_pagado, fecha_pago, metodo_pago) 
                 VALUES (%s, %s, %s, %s)
-            """, (row['prestamo_id'], row['monto_pagado'], row['fecha_pago'], row['metodo_pago']))
+            """, (
+                row['prestamo_id'],
+                row['monto_pagado'],
+                row['fecha_pago'],
+                row['metodo_pago']
+            ))
 
         connection.commit()
+        cursor.close()
         connection.close()
 
         flash("Archivo de pagos procesado correctamente", "success")
+
     except Exception as e:
-        flash(f"Error al procesar el archivo: {e}", "error")
+        flash(f"Error al procesar el archivo de pagos: {e}", "error")
 
     return redirect(url_for('home'))
+
 
 @app.route('/')
 def home():
@@ -406,26 +436,55 @@ def analisis():
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
 
-    # Obtener datos de clientes
-    cursor.execute("SELECT COUNT(*) AS total_clientes FROM clientes")
-    total_clientes = cursor.fetchone()['total_clientes']
+    try:
+        # Resumen de clientes
+        cursor.execute("SELECT COUNT(*) AS total_clientes FROM clientes")
+        total_clientes = cursor.fetchone().get('total_clientes', 0)
 
-    # Obtener la distribución de préstamos
-    cursor.execute("SELECT estado_prestamo, COUNT(*) AS cantidad FROM prestamos GROUP BY estado_prestamo")
-    prestamos_estado = cursor.fetchall()
+        cursor.execute("SELECT COALESCE(SUM(saldo_cuenta), 0) AS saldo_total FROM clientes")
+        saldo_total = cursor.fetchone().get('saldo_total', 0)
 
-    # Obtener la distribución de fraudes
-    cursor.execute("SELECT estado, COUNT(*) AS cantidad FROM fraudes GROUP BY estado")
-    fraudes_estado = cursor.fetchall()
+        cursor.execute("SELECT COALESCE(AVG(edad), 0) AS promedio_edad FROM clientes")
+        promedio_edad = cursor.fetchone().get('promedio_edad', 0)
 
-    # Obtener el flujo de transacciones
-    cursor.execute("SELECT tipo_transaccion, SUM(monto) AS total FROM transacciones GROUP BY tipo_transaccion")
-    transacciones_tipo = cursor.fetchall()
+        cursor.execute("SELECT COALESCE(AVG(ingreso_mensual), 0) AS promedio_ingreso FROM clientes")
+        promedio_ingreso = cursor.fetchone().get('promedio_ingreso', 0)
 
-    connection.close()
+        # Resumen de préstamos
+        cursor.execute("SELECT COUNT(*) AS total_prestamos FROM prestamos")
+        total_prestamos = cursor.fetchone().get('total_prestamos', 0)
 
-    return render_template('analisis.html',
-                           total_clientes=total_clientes,
-                           prestamos_estado=prestamos_estado,
-                           fraudes_estado=fraudes_estado,
-                           transacciones_tipo=transacciones_tipo)
+        cursor.execute("SELECT COALESCE(SUM(monto_prestamo), 0) AS monto_total_prestamos FROM prestamos")
+        monto_total_prestamos = cursor.fetchone().get('monto_total_prestamos', 0)
+
+        cursor.execute("SELECT COALESCE(AVG(tasa_interes), 0) AS promedio_tasa_interes FROM prestamos")
+        promedio_tasa_interes = cursor.fetchone().get('promedio_tasa_interes', 0)
+
+        cursor.execute("""
+            SELECT 
+                COUNT(*) AS total_prestamos, 
+                SUM(CASE WHEN pagos_atrasados > 0 THEN 1 ELSE 0 END) AS prestamos_en_mora,
+                (SUM(CASE WHEN pagos_atrasados > 0 THEN 1 ELSE 0 END) / COUNT(*)) * 100 AS porcentaje_mora
+            FROM prestamos
+        """)
+        resultados_mora = cursor.fetchone()
+
+        total_prestamos = resultados_mora.get('total_prestamos', 0)
+        prestamos_en_mora = resultados_mora.get('prestamos_en_mora', 0)
+        porcentaje_mora = resultados_mora.get('porcentaje_mora', 0)
+
+        connection.close()
+
+        # Pasar datos a la plantilla
+        return render_template('analisis.html',
+                               total_clientes=total_clientes,
+                               saldo_total=saldo_total,
+                               promedio_edad=promedio_edad,
+                               promedio_ingreso=promedio_ingreso,
+                               total_prestamos=total_prestamos,
+                               monto_total_prestamos=monto_total_prestamos,
+                               promedio_tasa_interes=promedio_tasa_interes,
+                               prestamos_en_mora=prestamos_en_mora)
+    except Exception as e:
+        connection.close()
+        return f"Error al obtener datos de análisis: {str(e)}"

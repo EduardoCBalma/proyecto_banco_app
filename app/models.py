@@ -22,12 +22,13 @@ class Clientes(db.Model):
     fecha_registro = db.Column(db.DateTime, default=db.func.current_timestamp())
 
 def get_db_connection():
-    """Establece conexión con la base de datos local MySQL."""
+    """Establece conexión con la base de datos remota."""
     connection = mysql.connector.connect(
-        host='localhost',      
-        user='root',           
-        password='171189',  
-        database='banco_app',  
+        host='sql7.freesqldatabase.com',  # Anfitrión de la base de datos remota
+        user='sql7759063',                # Usuario de la base de datos
+        password='x2nP8AmfFB',             # Contraseña de la base de datos
+        database='sql7759063',             # Nombre de la base de datos
+        port=3306,                         # Puerto de conexión
         autocommit=True
     )
     return connection

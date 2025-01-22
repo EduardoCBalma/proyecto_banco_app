@@ -52,7 +52,7 @@
     <div class="container mt-5">
         <h1 class="text-center mb-4">Análisis Financiero</h1>
 
-        <!-- Resumen de Datos -->
+            <!-- Resumen de Datos -->
     <div class="row">
         <div class="col-md-6">
             <div class="card shadow-sm">
@@ -60,10 +60,10 @@
                     <h4>Resumen de Clientes</h4>
                 </div>
                 <div class="card-body">
-                    <p><strong>Total de Clientes:</strong> {{ resumen.total_clientes if resumen is defined else 0 }}</p>
-                    <p><strong>Saldo Total:</strong> ${{ resumen.saldo_total if resumen is defined else 0 }}</p>
-                    <p><strong>Promedio de Edad:</strong> {{ resumen.promedio_edad if resumen is defined else 0 }}</p>
-                    <p><strong>Promedio de Ingreso Mensual:</strong> ${{ resumen.promedio_ingreso if resumen is defined else 0 }}</p>
+                    <p><strong>Total de Clientes:</strong> {{ total_clientes }}</p>
+                    <p><strong>Saldo Total:</strong> ${{ saldo_total }}</p>
+                    <p><strong>Promedio de Edad:</strong> {{ promedio_edad }}</p>
+                    <p><strong>Promedio de Ingreso Mensual:</strong> ${{ promedio_ingreso }}</p>
                 </div>
             </div>
         </div>
@@ -74,9 +74,10 @@
                     <h4>Resumen de Préstamos</h4>
                 </div>
                 <div class="card-body">
-                    <p><strong>Total de Préstamos:</strong> {{ resumen.total_prestamos if resumen is defined else 0 }}</p>
-                    <p><strong>Monto Total Prestado:</strong> ${{ resumen.monto_total_prestamos if resumen is defined else 0 }}</p>
-                    <p><strong>Tasa de Interés Promedio:</strong> {{ resumen.promedio_tasa_interes if resumen is defined else 0 }}</p>
+                    <p><strong>Total de Préstamos:</strong> {{ total_prestamos }}</p>
+                    <p><strong>Monto Total Prestado:</strong> ${{ monto_total_prestamos }}</p>
+                    <p><strong>Tasa de Interés Promedio:</strong> {{ promedio_tasa_interes }}</p>
+                    <p><strong>Prestamos en Mora:</strong> {{ prestamos_en_mora }}</p>
                 </div>
             </div>
         </div>
