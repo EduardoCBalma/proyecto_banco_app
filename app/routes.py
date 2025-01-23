@@ -488,3 +488,8 @@ def analisis():
     except Exception as e:
         connection.close()
         return f"Error al obtener datos de análisis: {str(e)}"
+    
+@app.route('/analisis_dashboard')
+def dashboard_analisis():
+    return render_template('analisis.html', fecha_actual=datetime.now().strftime('%d/%m/%Y'))
+
