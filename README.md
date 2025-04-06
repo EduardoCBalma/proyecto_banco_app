@@ -63,16 +63,6 @@ Este proyecto se conecta directamente a una base de datos MySQL y visualiza los 
 
 ---
 
-## 📸 Capturas del sistema
-
-> 📍 Puedes incluir imágenes dentro del repositorio en una carpeta `/screenshots` y enlazarlas aquí:
-
-![Clientes](screenshots/clientes.png)
-![Dashboard](screenshots/dashboard.png)
-![Carga CSV](screenshots/carga_csv.png)
-
----
-
 ## 📅 Última actualización
 
 `2025-04-06`
