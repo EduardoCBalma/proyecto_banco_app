@@ -493,3 +493,69 @@ def analisis():
 def dashboard_analisis():
     return render_template('analisis.html', fecha_actual=datetime.now().strftime('%d/%m/%Y'))
 
+@app.route('/test-db')
+def test_db():
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        cursor.execute("SHOW TABLES;")
+        tablas = cursor.fetchall()
+        connection.close()
+        return f"Conexión exitosa. Tablas encontradas: {tablas}"
+    except Exception as e:
+        return f"Error al conectar a la base de datos: {str(e)}"
+
+@app.route('/eliminar_clientes', methods=['POST'])
+def eliminar_clientes():
+    return eliminar_tabla('clientes')
+
+@app.route('/eliminar_prestamos', methods=['POST'])
+def eliminar_prestamos():
+    return eliminar_tabla('prestamos')
+
+@app.route('/eliminar_transacciones', methods=['POST'])
+def eliminar_transacciones():
+    return eliminar_tabla('transacciones')
+
+@app.route('/eliminar_fraudes', methods=['POST'])
+def eliminar_fraudes():
+    return eliminar_tabla('fraudes')
+
+@app.route('/eliminar_pagos', methods=['POST'])
+def eliminar_pagos():
+    return eliminar_tabla('pagos')
+
+def eliminar_tabla(nombre_tabla):
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
+        cursor.execute(f"DELETE FROM {nombre_tabla}")
+        connection.commit()
+        connection.close()
+        flash(f"Todos los datos de la tabla '{nombre_tabla}' han sido eliminados", "warning")
+    except Exception as e:
+        flash(f"Error al eliminar los datos de {nombre_tabla}: {e}", "danger")
+
+    return redirect(url_for('datos'))
+
+@app.route('/eliminar_todo', methods=['POST'])
+def eliminar_todo():
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor()
+
+        # Orden correcto por relaciones
+        cursor.execute("DELETE FROM pagos")
+        cursor.execute("DELETE FROM fraudes")
+        cursor.execute("DELETE FROM transacciones")
+        cursor.execute("DELETE FROM prestamos")
+        cursor.execute("DELETE FROM clientes")
+
+        connection.commit()
+        connection.close()
+
+        flash("🚨 ¡Toda la información de la base de datos ha sido eliminada!", "danger")
+    except Exception as e:
+        flash(f"❌ Error al eliminar todos los datos: {e}", "danger")
+
+    return redirect(url_for('datos'))

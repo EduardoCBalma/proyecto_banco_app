@@ -23,8 +23,15 @@
         </li>
     </ul>
 
-    <div class="tab-content mt-3">
-        <!-- Clientes -->
+    <!-- Botón maestro -->
+    <form class="mt-3" method="POST" action="/eliminar_todo" onsubmit="return confirm('⚠️ Esta acción eliminará TODOS los datos. ¿Estás completamente seguro?');">
+        <button type="submit" class="btn btn-danger btn-lg btn-block">
+            🗑️ Eliminar TODA la información de la base de datos
+        </button>
+    </form>
+
+    <div class="tab-content mt-4">
+        <!-- CLIENTES -->
         <div class="tab-pane fade show active" id="clientes" role="tabpanel">
             <h4>Clientes</h4>
             <table class="table table-bordered table-striped datatable">
@@ -53,9 +60,12 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <form method="POST" action="/eliminar_clientes" onsubmit="return confirm('¿Eliminar todos los clientes?');">
+                <button type="submit" class="btn btn-danger">🗑️ Eliminar todos los clientes</button>
+            </form>
         </div>
 
-        <!-- Préstamos -->
+        <!-- PRESTAMOS -->
         <div class="tab-pane fade" id="prestamos" role="tabpanel">
             <h4>Préstamos</h4>
             <table class="table table-bordered table-striped datatable">
@@ -82,9 +92,12 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <form method="POST" action="/eliminar_prestamos" onsubmit="return confirm('¿Eliminar todos los préstamos?');">
+                <button type="submit" class="btn btn-danger">🗑️ Eliminar todos los préstamos</button>
+            </form>
         </div>
 
-        <!-- Transacciones -->
+        <!-- TRANSACCIONES -->
         <div class="tab-pane fade" id="transacciones" role="tabpanel">
             <h4>Transacciones</h4>
             <table class="table table-bordered table-striped datatable">
@@ -111,9 +124,12 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <form method="POST" action="/eliminar_transacciones" onsubmit="return confirm('¿Eliminar todas las transacciones?');">
+                <button type="submit" class="btn btn-danger">🗑️ Eliminar todas las transacciones</button>
+            </form>
         </div>
 
-        <!-- Pagos -->
+        <!-- PAGOS -->
         <div class="tab-pane fade" id="pagos" role="tabpanel">
             <h4>Pagos</h4>
             <table class="table table-bordered table-striped datatable">
@@ -138,9 +154,12 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <form method="POST" action="/eliminar_pagos" onsubmit="return confirm('¿Eliminar todos los pagos?');">
+                <button type="submit" class="btn btn-danger">🗑️ Eliminar todos los pagos</button>
+            </form>
         </div>
 
-        <!-- Fraudes -->
+        <!-- FRAUDES -->
         <div class="tab-pane fade" id="fraudes" role="tabpanel">
             <h4>Fraudes</h4>
             <table class="table table-bordered table-striped datatable">
@@ -167,6 +186,9 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <form method="POST" action="/eliminar_fraudes" onsubmit="return confirm('¿Eliminar todos los fraudes?');">
+                <button type="submit" class="btn btn-danger">🗑️ Eliminar todos los fraudes</button>
+            </form>
         </div>
     </div>
 </div>

@@ -21,13 +21,56 @@ class Clientes(db.Model):
     ocupacion = db.Column(db.String(100), nullable=False)
     fecha_registro = db.Column(db.DateTime, default=db.func.current_timestamp())
 
+class Prestamos(db.Model):
+    __tablename__ = 'prestamos'
+    
+    prestamo_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    cliente_id = db.Column(db.Integer, nullable=False)
+    monto_prestamo = db.Column(db.Numeric(10, 2), nullable=False)
+    tasa_interes = db.Column(db.Float, nullable=False)
+    plazo_meses = db.Column(db.Integer, nullable=False)
+    historial_credito = db.Column(db.Integer, nullable=False)
+    pagos_atrasados = db.Column(db.Integer, nullable=False)
+    estado_prestamo = db.Column(db.String(50), nullable=False)
+    fecha_inicio = db.Column(db.Date, nullable=False)
+    fecha_vencimiento = db.Column(db.Date, nullable=False)
+
+class Pagos(db.Model):
+    __tablename__ = 'pagos'
+    
+    pago_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    prestamo_id = db.Column(db.Integer, nullable=False)
+    monto_pagado = db.Column(db.Numeric(10, 2), nullable=False)
+    fecha_pago = db.Column(db.Date, nullable=False)
+    metodo_pago = db.Column(db.String(50), nullable=False)
+
+class Fraudes(db.Model):
+    __tablename__ = 'fraudes'
+    
+    fraude_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    cliente_id = db.Column(db.Integer, nullable=False)
+    descripcion = db.Column(db.String(255), nullable=False)
+    monto_implicado = db.Column(db.Numeric(10, 2), nullable=False)
+    fecha_fraude = db.Column(db.Date, nullable=True)
+    estado = db.Column(db.String(50), nullable=False)
+
+class Transacciones(db.Model):
+    __tablename__ = 'transacciones'
+    
+    transaccion_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    cliente_id = db.Column(db.Integer, nullable=False)
+    tipo_transaccion = db.Column(db.String(50), nullable=False)
+    monto = db.Column(db.Numeric(10, 2), nullable=False)
+    fecha_transaccion = db.Column(db.Date, nullable=False)
+    categoria_transaccion = db.Column(db.String(50), nullable=False)
+
 def get_db_connection():
     """Establece conexión con la base de datos remota."""
     connection = mysql.connector.connect(
-        host='sql7.freesqldatabase.com',  # Anfitrión de la base de datos remota
-        user='sql7759063',                # Usuario de la base de datos
-        password='x2nP8AmfFB',             # Contraseña de la base de datos
-        database='sql7759063',             # Nombre de la base de datos
+        host='db4free.net',  # Anfitrión de la base de datos remota
+        user='eduardocv',                # Usuario de la base de datos
+        password='Balma2025!',             # Contraseña de la base de datos
+        database='bancoappcv',             # Nombre de la base de datos
         port=3306,                         # Puerto de conexión
         autocommit=True
     )
